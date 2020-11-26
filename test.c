@@ -6,15 +6,16 @@
 /*   By: agraton </var/mail/agraton>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 12:08:23 by agraton           #+#    #+#             */
-/*   Updated: 2020/11/26 12:26:10 by agraton          ###   ########.fr       */
+/*   Updated: 2020/11/26 17:21:40 by agraton          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdio.h>
+#include <stdlib.h>
 
 int		main(void)
 {
-	if (printf("1\n") && printf("2\n") && printf("3\n"))
-		;
+	printf("%d\n", (int)malloc(0));
+//	int i =	(printf("1\n") || printf("2\n")) ? 1 : 0 ;
 	return (0);
 }
