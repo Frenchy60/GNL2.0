@@ -6,7 +6,7 @@
 /*   By: agraton </var/mail/agraton>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/06 09:19:00 by agraton           #+#    #+#             */
-/*   Updated: 2021/08/07 14:20:08 by agraton          ###   ########.fr       */
+/*   Updated: 2021/08/07 16:29:10 by agraton          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,43 +25,29 @@ int	ft_contains(char *str, char stop)
 	return (0);
 }
 
-int	ft_strlenc(char *str, char stop)
-{
-	int	i;
-
-	i = 0;
-	if (!str)
-		return (0);
-	while (str[i] && str[i] != stop)
-		i++;
-	return (i);
-}
-
 char	*ft_strjoinc(char *str, char *str2, char stop)
 {
-	int		i;
-	int		o;
-	int		p;
+	int		i[3];
 	char	*newstr;
 
-	i = ft_strlenc(str2, stop);
-	o = ft_strlenc(str, stop);
-	newstr = malloc(sizeof(char) * (i + o + 2));
+	i[0] = ft_strlenc(str2, stop);
+	i[1] = ft_strlenc(str, stop);
+	newstr = malloc(sizeof(char) * (i[0] + i[1] + 2));
 	if (!newstr)
 	{
 		if (str)
 			free(str);
 		return (NULL);
 	}
-	p = -1;
-	while (++p < o)
-		newstr[p] = str[p];
-	p = -1;
-	while (++p < i)
-		newstr[o + p] = str2[p];
-	if (str2[p] == '\n')
-		newstr[i++ + o] = '\n';
-	newstr[i + o] = '\0';
+	i[2] = -1;
+	while (++i[2] < i[1])
+		newstr[i[2]] = str[i[2]];
+	i[2] = -1;
+	while (++i[2] < i[0])
+		newstr[i[1] + i[2]] = str2[i[2]];
+	if (str2[i[2]] == '\n')
+		newstr[i[0]++ + i[1]] = '\n';
+	newstr[i[0] + i[1]] = '\0';
 	if (str)
 		free(str);
 	return (newstr);
@@ -75,14 +61,24 @@ void	ft_strmove(char *str, char stop)
 	size = ft_strlenc(str, stop);
 	i = 1;
 	if (str[size])
+	{
 		while (str[size + i])
 		{
 			str[i - 1] = str[size + i];
 			i++;
 		}
+	}
 	i--;
-	while (i <= BUFFER_SIZE)
-		str[i++] = '\0';
+	str[i++] = '\0';
+}
+
+char	*get_next_line_end(char *buffer, char *newline, int readn)
+{
+	ft_strmove(buffer, '\n');
+	if (!newline || (!(ft_strlenc(newline, '\n')
+				+ ft_strlenc(buffer, '\n')) && !readn))
+		return (ft_error(newline));
+	return (newline);
 }
 
 char	*get_next_line(int fd)
@@ -93,34 +89,23 @@ char	*get_next_line(int fd)
 
 	if (fd <= 0 || fd >= OPEN_MAX)
 		return (NULL);
-	readn = -5;
+	readn = BUFFER_SIZE;
 	newline = NULL;
 	if (ft_strlenc(buffer[fd], '\0'))
 	{
-			newline = ft_strjoinc(newline, buffer[fd], '\n');
+		newline = ft_strjoinc(newline, buffer[fd], '\n');
 		if (!newline)
 			return (NULL);
 	}
-	while (!ft_contains(buffer[fd], '\n') && (readn == BUFFER_SIZE || readn == -5))
+	while (!ft_contains(buffer[fd], '\n') && readn == BUFFER_SIZE)
 	{
 		readn = read(fd, buffer[fd], BUFFER_SIZE);
 		if (readn < 0)
-		{
-			if (newline)
-				free(newline);
-			return (NULL);
-		}
+			return (ft_error(newline));
 		buffer[fd][readn] = '\0';
 		newline = ft_strjoinc(newline, buffer[fd], '\n');
 		if (!newline)
 			return (NULL);
 	}
-	ft_strmove((char *)(buffer[fd]), '\n');
-	if (!newline || (!(ft_strlenc(newline, '\n') + ft_strlenc(buffer[fd], '\n')) && !readn))
-	{
-		if (newline)
-			free(newline);
-		return (NULL);
-	}
-	return (newline);
+	return (get_next_line_end((char *)(buffer[fd]), newline, readn));
 }

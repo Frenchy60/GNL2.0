@@ -1,24 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   get_next_line_utils_bonus.c                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: agraton </var/mail/agraton>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/08/06 09:51:25 by agraton           #+#    #+#             */
-/*   Updated: 2021/08/07 16:30:37 by agraton          ###   ########.fr       */
+/*   Created: 2021/08/06 09:55:29 by agraton           #+#    #+#             */
+/*   Updated: 2021/08/07 16:34:32 by agraton          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
-# include <unistd.h>
-# include <stdlib.h>
-# include <stdio.h>
-# define OPEN_MAX 15
+#include "get_next_line_bonus.h"
 
-char	*get_next_line(int fd);
-char	*ft_error(char *str);
-int		ft_strlenc(char *str, char stop);
+int	ft_strlenc(char *str, char stop)
+{
+	int	i;
 
-#endif
+	i = 0;
+	if (!str)
+		return (0);
+	while (str[i] && str[i] != stop)
+		i++;
+	return (i);
+}
+
+char	*ft_error(char *str)
+{
+	if (str)
+		free(str);
+	return (NULL);
+}
